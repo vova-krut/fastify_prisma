@@ -8,6 +8,12 @@ dotenv.config();
 export const server = Fastify();
 const PORT = Number(process.env.PORT) || 5000;
 
+declare module "fastify" {
+    export interface FastifyInstance {
+        authenticate: any;
+    }
+}
+
 server.register(fjwt, {
     secret: "d3k21n3k21n3j12neoiwqnidsadas1j12i31",
 });

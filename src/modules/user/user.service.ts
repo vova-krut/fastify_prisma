@@ -17,6 +17,16 @@ class UserService {
     async findUserByEmail(email: string) {
         return prisma.user.findUnique({ where: { email } });
     }
+
+    async findUsers() {
+        return prisma.user.findMany({
+            select: {
+                id: true,
+                email: true,
+                name: true,
+            },
+        });
+    }
 }
 
 export default new UserService();

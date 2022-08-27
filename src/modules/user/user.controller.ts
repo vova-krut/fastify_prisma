@@ -38,6 +38,11 @@ class UserController {
         }
         return res.code(401).send({ message: "Invalid email or password" });
     }
+
+    async getUsersHandler(req: FastifyRequest, res: FastifyReply) {
+        const users = await userService.findUsers();
+        return users;
+    }
 }
 
 export default new UserController();

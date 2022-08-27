@@ -28,6 +28,14 @@ async function userRoutes(server: FastifyInstance) {
         },
         userController.loginHandler
     );
+
+    server.get(
+        "/",
+        {
+            preHandler: [server.authenticate],
+        },
+        userController.getUsersHandler
+    );
 }
 
 export default userRoutes;
