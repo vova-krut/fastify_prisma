@@ -1,6 +1,8 @@
-import { CreateUserInput } from "./user.schema";
+import { server } from "./../../app";
+import { CreateUserInput, LoginInput } from "./user.schema";
 import { FastifyRequest, FastifyReply } from "fastify";
 import userService from "./user.service";
+import { verifyPassword } from "../../utils/hash";
 
 class UserController {
     async createUserHandler(
@@ -14,6 +16,27 @@ class UserController {
         } catch (e) {
             return res.code(500).send(e);
         }
+    }
+
+    async loginHandler(
+        req: FastifyRequest<{ Body: LoginInput }>,
+        res: FastifyReply
+    ) {
+        const body = req.body;
+        const user = await userService.findUserByEmail(body.email);
+        if (!user) {
+            res.code(401).send({ message: "Invalid email or password" });
+        }
+        const correctPassword = verifyPassword({
+            candidatePassword: body.password,
+            salt: user!.salt,
+            hash: user!.password,
+        });
+        if (correctPassword) {
+            const { password, salt, ...rest } = user!;
+            return { accessToken: server.jwt.sign(rest) };
+        }
+        return res.code(401).send({ message: "Invalid email or password" });
     }
 }
 

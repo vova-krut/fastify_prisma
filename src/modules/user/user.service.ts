@@ -13,6 +13,10 @@ class UserService {
 
         return user;
     }
+
+    async findUserByEmail(email: string) {
+        return prisma.user.findUnique({ where: { email } });
+    }
 }
 
 export default new UserService();

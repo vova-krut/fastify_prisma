@@ -1,11 +1,27 @@
-import Fastify from "fastify";
+import Fastify, { FastifyReply, FastifyRequest } from "fastify";
 import userRoutes from "./modules/user/user.routes";
 import { userSchemas } from "./modules/user/user.schema";
+import fjwt from "@fastify/jwt";
 import dotenv from "dotenv";
 dotenv.config();
 
-const server = Fastify();
+export const server = Fastify();
 const PORT = Number(process.env.PORT) || 5000;
+
+server.register(fjwt, {
+    secret: "d3k21n3k21n3j12neoiwqnidsadas1j12i31",
+});
+
+server.decorate(
+    "authenticate",
+    async (req: FastifyRequest, res: FastifyReply) => {
+        try {
+            await req.jwtVerify();
+        } catch (e) {
+            return res.send(e);
+        }
+    }
+);
 
 server.get("/healthcheck", async () => {
     return { status: "OK" };
