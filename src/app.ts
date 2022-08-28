@@ -1,8 +1,10 @@
 import Fastify, { FastifyReply, FastifyRequest } from "fastify";
 import userRoutes from "./modules/user/user.routes";
 import { userSchemas } from "./modules/user/user.schema";
+import { productSchemas } from "./modules/product/product.schema";
 import fjwt from "@fastify/jwt";
 import dotenv from "dotenv";
+import productRoutes from "./modules/product/product.routes";
 dotenv.config();
 
 export const server = Fastify();
@@ -11,6 +13,16 @@ const PORT = Number(process.env.PORT) || 5000;
 declare module "fastify" {
     export interface FastifyInstance {
         authenticate: any;
+    }
+}
+
+declare module "@fastify/jwt" {
+    interface FastifyJWT {
+        user: {
+            id: number;
+            email: string;
+            name: string;
+        };
     }
 }
 
@@ -34,10 +46,11 @@ server.get("/healthcheck", async () => {
 });
 
 async function main() {
-    for (const schema of userSchemas) {
+    for (const schema of [...userSchemas, ...productSchemas]) {
         server.addSchema(schema);
     }
     server.register(userRoutes, { prefix: "api/users" });
+    server.register(productRoutes, { prefix: "api/products" });
 
     try {
         await server.listen({
