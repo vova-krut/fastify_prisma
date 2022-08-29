@@ -1,4 +1,3 @@
-import { server } from "./../../app";
 import { CreateUserInput, LoginInput } from "./user.schema";
 import { FastifyRequest, FastifyReply } from "fastify";
 import userService from "./user.service";
@@ -34,7 +33,7 @@ class UserController {
         });
         if (correctPassword) {
             const { password, salt, ...rest } = user!;
-            return { accessToken: server.jwt.sign(rest) };
+            return { accessToken: req.jwt.sign(rest) };
         }
         return res.code(401).send({ message: "Invalid email or password" });
     }
